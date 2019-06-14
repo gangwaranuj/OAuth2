@@ -1,6 +1,8 @@
 # demo-oauth2-spring-security
 
 A simple Password Flow demo with Spring Security OAuth 2
+![alt text](https://snag.gy/ZS4jK0.jpg)
+
 
 ## Testing
 
