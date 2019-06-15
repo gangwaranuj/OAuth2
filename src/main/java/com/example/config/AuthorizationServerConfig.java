@@ -18,6 +18,21 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
 
+	private static String REALM="MY_OAUTH_REALM";
+	private static final String CLIEN_ID = "my-trusted-client";
+	private static final String CLIENT_SECRET = "secret";
+	private static final String GRANT_TYPE = "password";
+	private static final String AUTHORIZATION_CODE = "authorization_code";
+	private static final String REFRESH_TOKEN = "refresh_token";
+	private static final String IMPLICIT = "implicit";
+	private static final String SCOPE_READ = "read";
+	private static final String SCOPE_WRITE = "write";
+	private static final String SCOPE_TRUST = "trust";
+	private static final String AUTH_ROLE_CLIENT="ROLE_CLIENT";
+	private static final String AUTH_ROLE_TRUSTED_CLIENT="ROLE_TRUSTED_CLIENT";
+	private	static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1*60*60;
+	private	static final int FREFRESH_TOKEN_VALIDITY_SECONDS = 6*60*60;
+
 	@Autowired
 	private TokenStore tokenStore;
 	@Autowired
@@ -26,30 +41,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Qualifier("authenticationManagerBean")
 	private AuthenticationManager authenticationManager;
 
-	private static String REALM="MY_OAUTH_REALM";
-	private static final String CLIEN_ID = "my-trusted-client";
-	private static final String GRANT_TYPE = "password";
-	private static final String CLIENT_SECRET = "secret";
-	private static final String AUTHORIZATION_CODE = "authorization_code";
-	private static final String REFRESH_TOKEN = "refresh_token";
-	private static final String IMPLICIT = "implicit";
-	private static final String SCOPE_READ = "read";
-	private static final String SCOPE_WRITE = "write";
-	private static final String SCOPE_TRUST = "trust";
-	private	static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1*60*60;
-	private	static final int FREFRESH_TOKEN_VALIDITY_SECONDS = 6*60*60;
-
-	
 	@Override
 	public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory() 
 		.withClient(CLIEN_ID) 
 		.secret(CLIENT_SECRET)
 		.scopes(SCOPE_READ, SCOPE_WRITE,SCOPE_TRUST) 
-		.authorities("USER", "ADMIN")
+		.authorities(AUTH_ROLE_CLIENT, AUTH_ROLE_TRUSTED_CLIENT)
 		.authorizedGrantTypes(GRANT_TYPE, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
-		.accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS).//Access token is only valid for 2 minutes.
-		refreshTokenValiditySeconds(FREFRESH_TOKEN_VALIDITY_SECONDS);//Refresh token is only valid for 10 minutes.
+		.refreshTokenValiditySeconds(Integer.valueOf(ACCESS_TOKEN_VALIDITY_SECONDS)).//Access token is only valid for 2 minutes.
+		refreshTokenValiditySeconds(Integer.valueOf(FREFRESH_TOKEN_VALIDITY_SECONDS));//Refresh token is only valid for 10 minutes.
 	}
 
 
@@ -63,7 +64,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
 		oauthServer.allowFormAuthenticationForClients();
 		oauthServer.realm(REALM+"/client");
-		
+
 	}
 
 }

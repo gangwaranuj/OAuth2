@@ -1,5 +1,7 @@
 package com.example.config;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,23 +15,32 @@ import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
 @Configuration
 @EnableWebSecurity
+
 public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private ClientDetailsService clientDetailsService;
+//	@Autowired
+//    private PasswordEncoderConfig Encoder;
+	
 	@Autowired
-    private PasswordEncoderConfig Encoder;
+	private CustomAuthenticationProvider customProvider;
 	
 	@Autowired
 	public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication()
+//		auth.inMemoryAuthentication()
+//		
+//		.withUser("user").password("Internal1").roles("USER");
 		
-		.withUser("user").password("Internal1").roles("USER");
+		auth.authenticationProvider(customProvider);
 //		.and().passwordEncoder(Encoder.encode()());
+		
+		
+		
 	}
 	
 	@Override
@@ -38,10 +49,12 @@ public class OAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 		return super.authenticationManagerBean();
 	}
 
+	@Autowired
+    private DataSource dataSource;
 	
 	@Bean
 	public TokenStore tokenStore() {
-		return new InMemoryTokenStore();
+		return new JdbcTokenStore(dataSource);
 	}
 	
 

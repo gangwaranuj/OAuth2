@@ -24,14 +24,12 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 	public void configure(HttpSecurity http) throws Exception {
 		http
 		.csrf().disable()
+		.httpBasic().disable()
 		.authorizeRequests()
 		.anyRequest().authenticated()
 		.antMatchers(AUTH_WHITELIST).permitAll() //Swagger-UI
-		.and()
-		.sessionManagement()
+		.and().sessionManagement()
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
-		http.httpBasic().disable();
 	}
 	
 	 private static final String[] AUTH_WHITELIST = {
