@@ -2,6 +2,7 @@ package com.example.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -53,10 +54,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	}
 
 
+	@Bean public CustomTokenEnhancer customTokenEnhancer() {
+	    return new CustomTokenEnhancer();
+	}
 	@Override
 	public void configure(final AuthorizationServerEndpointsConfigurer endpoints) {
-		endpoints.tokenStore(tokenStore).userApprovalHandler(userApprovalHandler)
-		.authenticationManager(authenticationManager);
+		endpoints.tokenStore(tokenStore)
+        .tokenEnhancer(customTokenEnhancer())
+        .authenticationManager(authenticationManager);
 	}
 
 	@Override
